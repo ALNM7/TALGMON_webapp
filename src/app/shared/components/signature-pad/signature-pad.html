@@ -1,0 +1,62 @@
+<div>
+  <div class="flex items-baseline justify-between mb-3">
+    <div>
+      <p class="text-sm font-bold text-ink-700">{{ title }}</p>
+      <p class="text-xs text-ink-300 mt-0.5">{{ subtitle }}</p>
+    </div>
+    @if (isConfirmed) {
+      <div class="flex items-center gap-1 text-ok">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span class="text-xs font-bold">Confirmada</span>
+      </div>
+    }
+  </div>
+
+  <div
+    class="bg-ink-50 rounded-2xl p-3 mb-3 border-2 transition-colors"
+    [class.border-ok-100]="isConfirmed"
+    [class.border-transparent]="!isConfirmed"
+  >
+    <canvas
+      #canvas
+      width="760"
+      height="260"
+      class="w-full rounded-xl border-2 border-ink-200 bg-white cursor-crosshair touch-none block"
+      style="height: 130px"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp()"
+      (pointerleave)="onPointerUp()"
+      (pointercancel)="onPointerUp()"
+    ></canvas>
+    @if (!hasDrawn) {
+      <p class="text-xs text-ink-300 text-center mt-2">Firme con el dedo en el área de arriba</p>
+    }
+  </div>
+
+  <div class="flex gap-2">
+    <button
+      type="button"
+      (click)="clear()"
+      class="flex-1 h-11 rounded-xl border-2 border-ink-200 text-xs font-bold text-ink-400 hover:border-ink-300 transition-colors"
+    >
+      Borrar
+    </button>
+    <button
+      type="button"
+      (click)="confirm()"
+      [disabled]="!hasDrawn"
+      class="flex-[2] h-11 rounded-xl text-xs font-bold transition-all disabled:opacity-30"
+      [class.bg-ok-50]="isConfirmed"
+      [class.text-ok]="isConfirmed"
+      [class.border-2]="isConfirmed"
+      [class.border-ok-100]="isConfirmed"
+      [class.bg-ink-700]="!isConfirmed"
+      [class.text-white]="!isConfirmed"
+    >
+      {{ isConfirmed ? 'Firmado' : confirmLabel }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-ink-50 flex justify-center">
+  <div class="w-full max-w-[430px] min-h-screen bg-white flex flex-col">
+    <div class="sticky top-0 bg-white border-b border-ink-100 z-10 px-6 py-4 flex items-center justify-between">
+      <button type="button" (click)="goBack()" class="text-sm font-semibold text-ink-400">← Volver</button>
+      <app-logo [heightPx]="22" />
+    </div>
+
+    @if (loading()) {
+      <p class="text-sm text-ink-300 text-center py-16">Cargando...</p>
+    } @else if (!order()) {
+      <p class="text-sm text-danger text-center py-16">No se encontró la orden.</p>
+    } @else {
+      <div class="flex-1 px-5 pt-6 pb-10">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-mono text-sm font-bold text-brand">{{ order()!.folio }}</span>
+          <span class="text-xs text-ink-300 font-mono">{{ order()!.created_at | date: 'd MMM y, HH:mm' }}</span>
+        </div>
+        <h1 class="text-lg font-extrabold text-ink-700 mb-1">{{ order()!.equipo }}</h1>
+        <p class="text-sm text-ink-400 mb-5">{{ order()!.unidad_aplicativa }}</p>
+
+        @if (auth.isAdmin()) {
+          <div class="mb-6">
+            <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Estatus</label>
+            <select
+              [ngModel]="order()!.status"
+              (ngModelChange)="onStatusChange($event)"
+              [disabled]="updatingStatus()"
+              class="w-full h-11 px-3 rounded-xl border-2 border-ink-100 bg-white text-sm font-semibold"
+            >
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        } @else {
+          <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-ink-100 text-ink mb-6">
+            {{ order()!.status_display }}
+          </span>
+        }
+
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <a [href]="pdfUrl()" target="_blank"
+            class="h-11 rounded-xl border-2 border-brand text-brand text-sm font-bold flex items-center justify-center">
+            Ver PDF
+          </a>
+          <div class="h-11 rounded-xl bg-ink-50 text-ink-400 text-sm font-semibold flex items-center justify-center">
+            {{ order()!.tipo_servicio_display }}
+          </div>
+        </div>
+
+        <div class="border border-ink-100 rounded-xl px-5 py-4 mb-3 mt-4">
+          <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Datos generales</span>
+          <div class="flex flex-col gap-2 text-sm">
+            <p><span class="text-ink-300">Marca / Modelo: </span><span class="font-medium text-ink-700">{{ order()!.marca }} · {{ order()!.modelo || '—' }}</span></p>
+            <p><span class="text-ink-300">Serie: </span><span class="font-medium text-ink-700">{{ order()!.serie || '—' }}</span></p>
+            <p><span class="text-ink-300">Inventario: </span><span class="font-medium text-ink-700">{{ order()!.inventario || '—' }}</span></p>
+            <p><span class="text-ink-300">Ubicación: </span><span class="font-medium text-ink-700">{{ order()!.ubicacion || '—' }}</span></p>
+            <p><span class="text-ink-300">Dirección: </span><span class="font-medium text-ink-700">{{ order()!.direccion || '—' }}</span></p>
+            <p><span class="text-ink-300">Ingeniero: </span><span class="font-medium text-ink-700">{{ order()!.engineer.first_name }} {{ order()!.engineer.last_name }}</span></p>
+          </div>
+        </div>
+
+        <div class="border border-ink-100 rounded-xl px-5 py-4 mb-3">
+          <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Procedimiento</span>
+          <p class="text-sm text-ink-700 leading-relaxed whitespace-pre-wrap">{{ order()!.procedimiento }}</p>
+        </div>
+
+        <div class="border border-ink-100 rounded-xl px-5 py-4 mb-3">
+          <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Observaciones</span>
+          <p class="text-sm text-ink-700 leading-relaxed whitespace-pre-wrap">{{ order()!.observaciones || 'Sin observaciones' }}</p>
+        </div>
+
+        @if (order()!.spare_parts.length > 0) {
+          <div class="border border-ink-100 rounded-xl px-5 py-4 mb-3">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Refacciones</span>
+            <div class="flex flex-col gap-2">
+              @for (r of order()!.spare_parts; track r.id) {
+                <div class="flex items-center gap-3 text-sm">
+                  <span class="font-mono text-xs text-ink-300">{{ r.codigo || '—' }}</span>
+                  <span class="flex-1 text-ink-700">{{ r.descripcion }}</span>
+                  <span class="font-mono text-xs font-semibold bg-ink-100 px-2 py-0.5 rounded-full">×{{ r.cantidad }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (order()!.photos.length > 0) {
+          <div class="border border-ink-100 rounded-xl px-5 py-4 mb-3">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Fotografías</span>
+            @for (group of [
+              { key: 'ANTES', label: 'Antes' },
+              { key: 'DURANTE', label: 'Durante' },
+              { key: 'DESPUES', label: 'Después' }
+            ]; track group.key) {
+              @if (photosByPhase($any(group.key)).length > 0) {
+                <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-2 mt-3 first:mt-0">{{ group.label }}</p>
+                <div class="grid grid-cols-4 gap-1.5">
+                  @for (p of photosByPhase($any(group.key)); track p.id) {
+                    <a [href]="p.image" target="_blank" class="aspect-square rounded-lg overflow-hidden bg-ink-100 block">
+                      <img [src]="p.image" class="w-full h-full object-cover" />
+                    </a>
+                  }
+                </div>
+              }
+            }
+          </div>
+        }
+
+        <div class="border border-ink-100 rounded-xl px-5 py-4">
+          <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Firmas</span>
+          <div class="flex flex-col gap-5">
+            <div>
+              <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-2">Ingeniero</p>
+              <p class="text-sm font-semibold text-ink-700 mb-2">{{ order()!.engineer.first_name }} {{ order()!.engineer.last_name }}</p>
+              <div class="bg-ink-50 rounded-xl p-3">
+                <img [src]="order()!.engineer_signature" class="w-full max-h-20 object-contain" />
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-2">Responsable de la unidad</p>
+              <p class="text-sm font-semibold text-ink-700">{{ order()!.client_name }}</p>
+              <p class="text-xs text-ink-300 mb-2">{{ order()!.client_position }}</p>
+              <div class="bg-ink-50 rounded-xl p-3">
+                <img [src]="order()!.client_signature" class="w-full max-h-20 object-contain" />
+              </div>
+              @if (order()!.client_accepted_terms_at) {
+                <p class="text-xs text-ok mt-2">
+                  ✓ Aceptó Términos y Condiciones el {{ order()!.client_accepted_terms_at | date: 'd/MM/y HH:mm' }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

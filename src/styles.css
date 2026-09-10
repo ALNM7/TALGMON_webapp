@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  --color-brand: #0969c5;
+  --color-brand-50: #ebf3fc;
+  --color-brand-100: #d4e7f9;
+  --color-brand-200: #a9cef4;
+  --color-brand-600: #0757a8;
+  --color-brand-700: #054a8c;
+
+  --color-ink: #444b53;
+  --color-ink-50: #f4f5f6;
+  --color-ink-100: #e8eaec;
+  --color-ink-200: #cdd0d4;
+  --color-ink-300: #9ba0a6;
+  --color-ink-400: #6b7480;
+  --color-ink-600: #353b42;
+  --color-ink-700: #272c31;
+
+  --color-ok: #2d6a4f;
+  --color-ok-50: #e6f4ed;
+  --color-ok-100: #c3e8d3;
+
+  --color-danger: #9b2c2c;
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+
+  --color-warn: #92400e;
+  --color-warn-50: #fef3c7;
+  --color-warn-100: #fde68a;
+}
+
+*,
+*::before,
+*::after {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+  background-color: #f4f5f6;
+  color: #444b53;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cdd0d4;
+  border-radius: 2px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}

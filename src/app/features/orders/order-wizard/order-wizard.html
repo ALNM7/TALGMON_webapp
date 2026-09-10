@@ -1,0 +1,430 @@
+<div class="min-h-screen bg-ink-50 flex justify-center">
+  <div class="w-full max-w-[430px] min-h-screen bg-white flex flex-col relative">
+    <!-- Header fijo -->
+    <div class="sticky top-0 bg-white z-10 border-b border-ink-100">
+      <div class="flex items-center justify-between px-6 py-4">
+        <app-logo [heightPx]="24" />
+        <div class="text-right">
+          <p class="text-xs font-bold text-ink uppercase tracking-wider">
+            Paso {{ step() }} de {{ steps.length }}
+          </p>
+          <p class="text-xs text-ink-300 font-medium">{{ currentStepTitle() }}</p>
+        </div>
+      </div>
+      <div class="flex gap-0.5 px-6 pb-4">
+        @for (s of steps; track s.id) {
+          <div
+            class="flex-1 h-1 rounded-full transition-colors duration-300"
+            [style.background-color]="s.id <= step() ? '#0969c5' : '#e8eaec'"
+          ></div>
+        }
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="flex-1 overflow-y-auto pb-28">
+      <!-- Paso 1: Datos generales -->
+      @if (step() === 1) {
+        <div class="px-6 pt-6">
+          <div class="bg-brand-50 rounded-xl px-4 py-3 mb-6 flex justify-between items-center">
+            <div>
+              <p class="text-xs font-semibold text-brand uppercase tracking-wider mb-0.5">Folio</p>
+              <p class="font-mono text-sm font-semibold text-ink-700">Se genera al enviar</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs font-semibold text-brand uppercase tracking-wider mb-0.5">Fecha</p>
+              <p class="font-mono text-sm font-semibold text-ink-700">{{ today() }}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-5">
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
+                Unidad aplicativa <span class="text-danger">*</span>
+              </label>
+              <input type="text" [ngModel]="draft().unidad_aplicativa" (ngModelChange)="updateField('unidad_aplicativa', $event)"
+                placeholder="Ej. Hospital General del Sur"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Dirección</label>
+              <input type="text" [ngModel]="draft().direccion" (ngModelChange)="updateField('direccion', $event)"
+                placeholder="Calle, colonia, ciudad"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
+                Equipo <span class="text-danger">*</span>
+              </label>
+              <input type="text" [ngModel]="draft().equipo" (ngModelChange)="updateField('equipo', $event)"
+                placeholder="Ej. Ventilador Mecánico"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
+                Marca <span class="text-danger">*</span>
+              </label>
+              <input type="text" [ngModel]="draft().marca" (ngModelChange)="updateField('marca', $event)"
+                placeholder="Ej. Philips"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Modelo</label>
+              <input type="text" [ngModel]="draft().modelo" (ngModelChange)="updateField('modelo', $event)"
+                placeholder="Ej. Trilogy 100"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">No. de serie</label>
+              <input type="text" [ngModel]="draft().serie" (ngModelChange)="updateField('serie', $event)"
+                placeholder="Ej. PHL-TRL-4821"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">No. inventario</label>
+              <input type="text" [ngModel]="draft().inventario" (ngModelChange)="updateField('inventario', $event)"
+                placeholder="Ej. INV-VM-0042"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Ubicación en la unidad</label>
+              <input type="text" [ngModel]="draft().ubicacion" (ngModelChange)="updateField('ubicacion', $event)"
+                placeholder="Ej. UCI Adultos, Cama 4"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Paso 2: Tipo de servicio -->
+      @if (step() === 2) {
+        <div class="px-6 pt-6">
+          <h2 class="text-base font-bold text-ink-700 mb-2">¿Qué tipo de servicio realizaste?</h2>
+          <p class="text-sm text-ink-300 mb-6">Selecciona una opción</p>
+          <div class="grid grid-cols-2 gap-3">
+            @for (t of serviceTypes; track t.id) {
+              <button
+                type="button"
+                (click)="selectServiceType(t.id)"
+                class="p-5 rounded-xl border-2 text-left transition-all active:scale-[0.97]"
+                [class.border-brand]="draft().tipo_servicio === t.id"
+                [class.bg-brand]="draft().tipo_servicio === t.id"
+                [class.text-white]="draft().tipo_servicio === t.id"
+                [class.border-ink-100]="draft().tipo_servicio !== t.id"
+                [class.bg-ink-50]="draft().tipo_servicio !== t.id"
+              >
+                <p class="font-bold text-base mb-1">{{ t.label }}</p>
+                <p class="text-xs font-medium leading-tight" [class.text-brand-200]="draft().tipo_servicio === t.id" [class.text-ink-300]="draft().tipo_servicio !== t.id">
+                  {{ t.desc }}
+                </p>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Paso 3: Procedimiento -->
+      @if (step() === 3) {
+        <div class="px-6 pt-6">
+          <h2 class="text-base font-bold text-ink-700 mb-2">Procedimiento realizado</h2>
+          <p class="text-sm text-ink-300 mb-5">Describe detalladamente las actividades que realizaste</p>
+          <textarea
+            [ngModel]="draft().procedimiento" (ngModelChange)="updateField('procedimiento', $event)"
+            placeholder="Describe paso a paso el trabajo realizado: revisión, diagnóstico, reparación, calibración, pruebas, etc."
+            rows="10"
+            class="w-full px-4 py-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium leading-relaxed resize-none transition-colors focus:border-brand focus:bg-white"
+          ></textarea>
+          <p class="text-xs text-ink-300 mt-2 text-right font-mono">{{ draft().procedimiento.length }} caracteres (mínimo 10)</p>
+        </div>
+      }
+
+      <!-- Paso 4: Observaciones + refacciones -->
+      @if (step() === 4) {
+        <div class="px-6 pt-6">
+          <div class="mb-6">
+            <h2 class="text-base font-bold text-ink-700 mb-2">Observaciones</h2>
+            <p class="text-sm text-ink-300 mb-4">Hallazgos, recomendaciones o notas adicionales</p>
+            <textarea
+              [ngModel]="draft().observaciones" (ngModelChange)="updateField('observaciones', $event)"
+              placeholder="Ej. Se recomienda reemplazar filtro en próximo servicio. Equipo operativo al 100%."
+              rows="5"
+              class="w-full px-4 py-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium leading-relaxed resize-none transition-colors focus:border-brand focus:bg-white"
+            ></textarea>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-bold text-ink-700">Refacciones utilizadas</h2>
+              <span class="text-xs font-mono text-ink-300">{{ draft().spare_parts.length }} ítem(s)</span>
+            </div>
+
+            @if (draft().spare_parts.length > 0) {
+              <div class="flex flex-col gap-3 mb-4">
+                @for (r of draft().spare_parts; track $index) {
+                  <div class="bg-ink-50 rounded-xl p-4 border border-ink-100">
+                    <div class="flex gap-2 mb-3">
+                      <div class="flex-1">
+                        <label class="block text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5">Código</label>
+                        <input type="text" [ngModel]="r.codigo" (ngModelChange)="updateSparePart($index, { codigo: $event })"
+                          placeholder="FLT-001"
+                          class="w-full h-10 px-3 rounded-lg border border-ink-200 bg-white text-ink text-sm font-mono focus:border-brand" />
+                      </div>
+                      <div style="width: 72px">
+                        <label class="block text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5">Cant.</label>
+                        <input type="number" min="1" [ngModel]="r.cantidad" (ngModelChange)="updateSparePart($index, { cantidad: $event })"
+                          class="w-full h-10 px-3 rounded-lg border border-ink-200 bg-white text-ink text-sm text-center font-mono focus:border-brand" />
+                      </div>
+                    </div>
+                    <div class="flex gap-2 items-end">
+                      <div class="flex-1">
+                        <label class="block text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5">Descripción</label>
+                        <input type="text" [ngModel]="r.descripcion" (ngModelChange)="updateSparePart($index, { descripcion: $event })"
+                          placeholder="Filtro bacteriano inspiratorio"
+                          class="w-full h-10 px-3 rounded-lg border border-ink-200 bg-white text-ink text-sm focus:border-brand" />
+                      </div>
+                      <button type="button" (click)="removeSparePart($index)"
+                        class="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-lg text-danger hover:bg-danger-50 transition-colors">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <button type="button" (click)="addSparePart()"
+              class="w-full h-12 rounded-xl border-2 border-dashed border-ink-200 text-sm font-semibold text-ink-400 flex items-center justify-center gap-2 hover:border-brand hover:text-brand transition-colors">
+              + Agregar refacción
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Paso 5: Fotografías -->
+      @if (step() === 5) {
+        <div class="px-6 pt-6">
+          <h2 class="text-base font-bold text-ink-700 mb-2">Fotografías del servicio</h2>
+          <p class="text-sm text-ink-300 mb-6">Agrega fotos de evidencia para cada etapa</p>
+
+          @for (phaseInfo of [
+            { key: 'ANTES', label: 'Antes del servicio', color: 'bg-warn-50 text-warn' },
+            { key: 'DURANTE', label: 'Durante el servicio', color: 'bg-brand-50 text-brand' },
+            { key: 'DESPUES', label: 'Después del servicio', color: 'bg-ok-50 text-ok' }
+          ]; track phaseInfo.key) {
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-ink-700">{{ phaseInfo.label }}</h3>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" [ngClass]="phaseInfo.color">
+                  {{ photoCount($any(phaseInfo.key)) }} foto(s)
+                </span>
+              </div>
+
+              @if (photoCount($any(phaseInfo.key)) > 0) {
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                  @for (photo of previewsFor($any(phaseInfo.key)); track $index) {
+                    <div class="relative aspect-square rounded-xl overflow-hidden bg-ink-100">
+                      <img [src]="photo.url" class="w-full h-full object-cover" />
+                      <button type="button" (click)="removePhoto($any(phaseInfo.key), $index)"
+                        class="absolute top-1 right-1 w-6 h-6 rounded-full bg-ink-700/80 text-white flex items-center justify-center text-xs">
+                        ✕
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              <label class="w-full h-12 rounded-xl border-2 border-dashed border-ink-200 text-sm font-semibold text-ink-400 flex items-center justify-center gap-2 hover:border-brand hover:text-brand transition-colors cursor-pointer">
+                Agregar foto
+                <input type="file" accept="image/*" multiple capture="environment" class="sr-only"
+                  (change)="onPhotoSelected($any(phaseInfo.key), $event)" />
+              </label>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Paso 6: Firma del ingeniero -->
+      @if (step() === 6) {
+        <div class="px-6 pt-6 pb-2">
+          <h2 class="text-base font-bold text-ink-700 mb-2">Tu firma</h2>
+          <p class="text-sm text-ink-300 mb-6">Firma para confirmar que realizaste el servicio descrito</p>
+
+          <div class="bg-brand-50 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-brand flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">
+              {{ engineerName.charAt(0) }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-ink-700">{{ engineerName }}</p>
+              <p class="text-xs text-ink-300">Ingeniero de servicio</p>
+            </div>
+          </div>
+
+          <app-signature-pad
+            title="Firma del ingeniero"
+            subtitle="Dibuja tu firma con el dedo"
+            (confirmed)="onEngineerSignatureConfirmed($event)"
+            (cleared)="onEngineerSignatureCleared()"
+          />
+        </div>
+      }
+
+      <!-- Paso 7: Firma del responsable + T&C -->
+      @if (step() === 7) {
+        <div class="px-6 pt-6 pb-2">
+          <h2 class="text-base font-bold text-ink-700 mb-2">Firma del responsable</h2>
+          <p class="text-sm text-ink-300 mb-6">Datos y firma de quien recibe el servicio en la unidad</p>
+
+          <div class="flex flex-col gap-5 mb-7">
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
+                Nombre completo <span class="text-danger">*</span>
+              </label>
+              <input type="text" [ngModel]="draft().client_name" (ngModelChange)="updateField('client_name', $event)"
+                placeholder="Ej. Dra. María González Ruiz"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">
+                Cargo / puesto <span class="text-danger">*</span>
+              </label>
+              <input type="text" [ngModel]="draft().client_position" (ngModelChange)="updateField('client_position', $event)"
+                placeholder="Ej. Jefa de Bioingeniería"
+                class="w-full h-12 px-4 rounded-xl border-2 border-ink-100 bg-ink-50 text-ink text-base font-medium transition-colors focus:border-brand focus:bg-white" />
+            </div>
+          </div>
+
+          <!-- Aviso de privacidad simplificado, obligatorio antes de firmar -->
+          <div class="bg-ink-50 border border-ink-100 rounded-xl px-4 py-3 mb-5">
+            <p class="text-xs text-ink-400 leading-relaxed">
+              <strong class="text-ink-700">Aviso de privacidad (firma):</strong>
+              TAGLMON recabará su nombre y firma para acreditar la conformidad del
+              servicio descrito en esta orden. La firma se trata como un dato
+              personal sensible (biométrico) y su captura requiere su
+              consentimiento. Puede consultar el
+              <a routerLink="/legal/aviso-de-privacidad" target="_blank" class="text-brand underline">Aviso de Privacidad integral</a>
+              para más detalle sobre el tratamiento de sus datos.
+            </p>
+          </div>
+
+          <app-signature-pad
+            title="Firma del responsable"
+            [subtitle]="draft().client_name || 'Responsable de la unidad'"
+            (confirmed)="onClientSignatureConfirmed($event)"
+            (cleared)="onClientSignatureCleared()"
+          />
+
+          <!-- Casilla de Términos y Condiciones — solo aplica a la firma del cliente -->
+          <label class="flex items-start gap-3 mt-6 cursor-pointer">
+            <input
+              type="checkbox"
+              [ngModel]="draft().client_accepted_terms"
+              (ngModelChange)="updateField('client_accepted_terms', $event)"
+              class="mt-0.5 w-5 h-5 rounded accent-brand cursor-pointer flex-shrink-0"
+            />
+            <span class="text-sm text-ink-600 leading-snug">
+              Acepto los
+              <a routerLink="/legal/terminos-y-condiciones" target="_blank" class="text-brand font-semibold underline">
+                Términos y Condiciones
+              </a>
+              del servicio.
+            </span>
+          </label>
+        </div>
+      }
+
+      <!-- Paso 8: Revisión y envío -->
+      @if (step() === 8) {
+        <div class="px-4 pt-6">
+          <div class="mb-5 px-2">
+            <h1 class="text-lg font-extrabold text-ink-700 mb-1">Revisa tu orden</h1>
+            <p class="text-sm text-ink-300">Verifica que todo esté correcto antes de enviar</p>
+          </div>
+
+          <div class="border border-ink-100 rounded-xl overflow-hidden mb-3 px-5 py-4">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Datos generales</span>
+            <div class="flex flex-col gap-2 text-sm">
+              <p><span class="text-ink-300">Unidad aplicativa: </span><span class="font-medium text-ink-700">{{ draft().unidad_aplicativa }}</span></p>
+              <p><span class="text-ink-300">Equipo: </span><span class="font-medium text-ink-700">{{ draft().equipo }} — {{ draft().marca }} {{ draft().modelo }}</span></p>
+              <p><span class="text-ink-300">Serie / inventario: </span><span class="font-medium text-ink-700">{{ draft().serie || '—' }} / {{ draft().inventario || '—' }}</span></p>
+              <p><span class="text-ink-300">Ubicación: </span><span class="font-medium text-ink-700">{{ draft().ubicacion || '—' }}</span></p>
+            </div>
+          </div>
+
+          <div class="border border-ink-100 rounded-xl overflow-hidden mb-3 px-5 py-4">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Tipo de servicio</span>
+            <div class="inline-block bg-brand-50 text-brand px-3 py-1 rounded-full text-sm font-semibold">
+              {{ serviceLabels[draft().tipo_servicio || ''] || '—' }}
+            </div>
+          </div>
+
+          <div class="border border-ink-100 rounded-xl overflow-hidden mb-3 px-5 py-4">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Procedimiento</span>
+            <p class="text-sm text-ink-700 leading-relaxed whitespace-pre-wrap">{{ draft().procedimiento }}</p>
+          </div>
+
+          @if (draft().spare_parts.length > 0) {
+            <div class="border border-ink-100 rounded-xl overflow-hidden mb-3 px-5 py-4">
+              <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">
+                Refacciones ({{ draft().spare_parts.length }})
+              </span>
+              <div class="flex flex-col gap-2">
+                @for (r of draft().spare_parts; track $index) {
+                  <div class="flex items-center gap-3 py-1 text-sm">
+                    <span class="font-mono text-xs text-ink-300">{{ r.codigo || '—' }}</span>
+                    <span class="flex-1 text-ink-700">{{ r.descripcion || 'Sin descripción' }}</span>
+                    <span class="font-mono text-xs font-semibold bg-ink-100 px-2 py-0.5 rounded-full">×{{ r.cantidad }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="border border-ink-100 rounded-xl overflow-hidden mb-3 px-5 py-4">
+            <span class="text-xs font-bold text-ink uppercase tracking-wider block mb-3">Firmas</span>
+            <div class="flex flex-col gap-5">
+              <div>
+                <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-2">Ingeniero</p>
+                <p class="text-sm font-semibold text-ink-700 mb-2">{{ engineerName }}</p>
+                @if (engineerSignaturePreview()) {
+                  <div class="bg-ink-50 rounded-xl p-3">
+                    <img [src]="engineerSignaturePreview()" class="w-full max-h-20 object-contain" />
+                  </div>
+                }
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-2">Responsable de la unidad</p>
+                <p class="text-sm font-semibold text-ink-700">{{ draft().client_name }}</p>
+                <p class="text-xs text-ink-300 mb-2">{{ draft().client_position }}</p>
+                @if (clientSignaturePreview()) {
+                  <div class="bg-ink-50 rounded-xl p-3">
+                    <img [src]="clientSignaturePreview()" class="w-full max-h-20 object-contain" />
+                  </div>
+                }
+                <p class="text-xs text-ok mt-2">✓ Aceptó los Términos y Condiciones</p>
+              </div>
+            </div>
+          </div>
+
+          @if (submitError()) {
+            <p class="text-sm text-danger bg-danger-50 rounded-lg px-4 py-3 mx-2">{{ submitError() }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Navegación inferior fija -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-ink-100 px-6 pt-4 pb-8 z-20"
+      style="box-shadow: 0 -8px 24px rgba(0,0,0,0.06)">
+      <div class="flex gap-3">
+        <button type="button" (click)="prev()"
+          class="flex-1 h-14 rounded-xl border-2 border-ink-200 text-base font-bold text-ink hover:bg-ink-50 transition-colors">
+          {{ step() === 1 ? 'Cancelar' : 'Atrás' }}
+        </button>
+        <button type="button" (click)="next()" [disabled]="!canProceed() || submitting()"
+          class="flex-[2] h-14 rounded-xl bg-brand text-white text-base font-bold disabled:opacity-35 transition-opacity active:scale-[0.98]">
+          {{ nextLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

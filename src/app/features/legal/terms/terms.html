@@ -1,0 +1,66 @@
+<div class="min-h-screen bg-ink-50 flex justify-center">
+  <div class="w-full max-w-[720px] min-h-screen bg-white px-6 md:px-12 py-10">
+    <div class="mb-8">
+      <app-logo [heightPx]="32" />
+    </div>
+
+    <h1 class="text-2xl font-extrabold text-ink-700 mb-1">Términos y Condiciones del servicio</h1>
+    <p class="text-sm text-ink-300 mb-8">Última actualización: {{ lastUpdated }}</p>
+
+    <div class="flex flex-col gap-6 text-sm text-ink-700 leading-relaxed">
+      <section>
+        <h2 class="text-base font-bold text-ink-700 mb-2">1. Objeto</h2>
+        <p>
+          Al firmar de conformidad en esta orden de servicio, usted declara que el
+          servicio de mantenimiento a equipo médico descrito en el documento fue
+          realizado y recibido a satisfacción, en los términos y con el alcance
+          detallado en la propia orden.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-ink-700 mb-2">2. Identidad del prestador del servicio</h2>
+        <p>
+          El servicio es prestado por TAGLMON, empresa de venta y mantenimiento de
+          equipo médico hospitalario con domicilio en Privada Tamaulipas número 211,
+          Colonia El Carmen, Puebla, México, a través de su personal técnico
+          identificado en la orden de servicio.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-ink-700 mb-2">3. Validez de la firma electrónica</h2>
+        <p>
+          La firma que usted dibuja en pantalla constituye una firma electrónica en
+          los términos del artículo 89 del Código de Comercio: datos en forma
+          electrónica asociados a este documento que lo identifican a usted como
+          firmante y expresan su conformidad con el contenido. Conforme al artículo
+          89 bis del Código de Comercio, esta firma tiene plena validez y fuerza
+          obligatoria aunque no sea una firma electrónica avanzada certificada.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-ink-700 mb-2">4. Datos personales</h2>
+        <p>
+          El tratamiento de su nombre y firma se rige por nuestro
+          <a routerLink="/legal/aviso-de-privacidad" class="text-brand underline">Aviso de Privacidad</a>,
+          el cual le recomendamos leer antes de firmar.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-ink-700 mb-2">5. Contacto</h2>
+        <p>
+          Para dudas o aclaraciones sobre estos términos o sobre el servicio
+          prestado, puede escribirnos a
+          <a href="mailto:ib.tagmon@gmail.com" class="text-brand underline">ib.tagmon@gmail.com</a>.
+        </p>
+      </section>
+    </div>
+
+    <a routerLink="/ingeniero/login" class="inline-block mt-10 text-sm text-brand font-semibold underline">
+      ← Volver
+    </a>
+  </div>
+</div>

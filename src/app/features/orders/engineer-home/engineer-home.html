@@ -1,0 +1,74 @@
+<div class="min-h-screen bg-ink-50 flex justify-center">
+  <div class="w-full max-w-[430px] min-h-screen bg-white flex flex-col">
+    <header class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-ink-100">
+      <app-logo [heightPx]="28" />
+      <button
+        (click)="logout()"
+        class="flex items-center gap-1.5 text-xs font-semibold text-ink-300 hover:text-ink-400 transition-colors"
+      >
+        Salir
+      </button>
+    </header>
+
+    <div class="px-6 pt-8 pb-6">
+      <p class="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1">
+        {{ greeting }}
+      </p>
+      <h1 class="text-2xl font-extrabold text-ink-700">{{ firstName }}</h1>
+    </div>
+
+    <div class="px-6 mb-8">
+      <a
+        routerLink="/ordenes/nueva"
+        class="w-full bg-brand text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-transform h-[72px]"
+        style="box-shadow: 0 4px 24px rgba(9,105,197,0.28)"
+      >
+        Nueva orden de servicio
+      </a>
+    </div>
+
+    <div class="flex-1 px-6 pb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-ink uppercase tracking-wider">Mis órdenes recientes</h2>
+        @if (orders().length > 0) {
+          <span class="text-xs text-ink-300 font-mono">{{ orders().length }} registros</span>
+        }
+      </div>
+
+      @if (loading()) {
+        <p class="text-sm text-ink-300 text-center py-10">Cargando...</p>
+      } @else if (orders().length === 0) {
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <p class="font-semibold text-ink text-sm mb-1">Sin órdenes todavía</p>
+          <p class="text-xs text-ink-300">Crea una nueva orden de servicio para comenzar</p>
+        </div>
+      } @else {
+        <div class="flex flex-col gap-3">
+          @for (order of orders(); track order.id) {
+            <a
+              [routerLink]="['/ordenes', order.id]"
+              class="bg-ink-50 rounded-xl p-4 border border-ink-100 block"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <span class="font-mono text-xs font-medium text-brand">{{ order.folio }}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full" [ngClass]="statusStyle[order.status]">
+                  {{ statusLabel[order.status] }}
+                </span>
+              </div>
+              <p class="font-bold text-sm text-ink-700 mb-0.5 leading-tight">{{ order.equipo }}</p>
+              <p class="text-xs text-ink-400 mb-2">{{ order.unidad_aplicativa }}</p>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-ink-300 bg-ink-100 px-2 py-0.5 rounded-full">
+                  {{ order.tipo_servicio_display }}
+                </span>
+                <span class="text-xs text-ink-300 font-mono">
+                  {{ order.created_at | date: 'd MMM' }}
+                </span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
