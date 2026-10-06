@@ -1,5 +1,7 @@
 export const environment = {
   production: true,
-  // PENDIENTE: reemplazar por la URL real del backend en Render al desplegar.
-  apiUrl: 'https://api-taglmon.onrender.com/api',
+  // Ruta relativa: Vercel reenvía /api/* al backend en Render (rewrite en
+  // vercel.json). Así las cookies de sesión son del mismo dominio y Safari
+  // no las bloquea como cookies de terceros.
+  apiUrl: '/api',
 };

@@ -43,9 +43,27 @@ const SERVICE_LABELS: Record<string, string> = Object.fromEntries(
   SERVICE_TYPES.map((s) => [s.id, s.label]),
 );
 
+/** Debe coincidir con ORDER_MAX_PHOTOS_PER_PHASE del backend. */
+export const MAX_PHOTOS_PER_PHASE = 10;
+
 interface PhotoPreview {
   file: File;
   url: string;
+}
+
+/** Convierte la respuesta de error del backend en un mensaje legible. DRF
+ * regresa {"detail": "..."} o {"campo": ["mensaje", ...]} por campo. */
+function submitErrorMessage(err: any): string {
+  const fallback = 'No se pudo enviar la orden. Verifica los datos e intenta de nuevo.';
+  if (err?.status === 0) return 'Sin conexión con el servidor. Revisa tu internet e intenta de nuevo.';
+  const body = err?.error;
+  if (!body || typeof body !== 'object') return fallback;
+  if (typeof body.detail === 'string') return body.detail;
+  for (const messages of Object.values(body)) {
+    const first = Array.isArray(messages) ? messages[0] : messages;
+    if (typeof first === 'string') return first;
+  }
+  return fallback;
 }
 
 @Component({
@@ -58,12 +76,14 @@ export class OrderWizard {
   readonly steps = STEPS;
   readonly serviceTypes = SERVICE_TYPES;
   readonly serviceLabels = SERVICE_LABELS;
+  readonly maxPhotos = MAX_PHOTOS_PER_PHASE;
 
   step = signal(1);
   draft = signal<OrderDraft>(emptyOrderDraft());
 
   submitting = signal(false);
   submitError = signal<string | null>(null);
+  photoLimitPhase = signal<PhotoPhase | null>(null);
 
   // Previews (no se mandan al backend, solo para mostrar en pantalla)
   photoPreviews = signal<Record<PhotoPhase, PhotoPreview[]>>({
@@ -129,7 +149,13 @@ export class OrderWizard {
     const files = input.files;
     if (!files || files.length === 0) return;
 
-    const newFiles = Array.from(files);
+    const available = MAX_PHOTOS_PER_PHASE - this.photoCount(phase);
+    const selected = Array.from(files);
+    const newFiles = selected.slice(0, Math.max(available, 0));
+    this.photoLimitPhase.set(selected.length > newFiles.length ? phase : null);
+    input.value = '';
+    if (newFiles.length === 0) return;
+
     const key = phase === 'ANTES' ? 'photos_antes' : phase === 'DURANTE' ? 'photos_durante' : 'photos_despues';
     this.draft.update((d) => ({ ...d, [key]: [...d[key], ...newFiles] }));
 
@@ -140,11 +166,10 @@ export class OrderWizard {
         ...newFiles.map((file) => ({ file, url: URL.createObjectURL(file) })),
       ],
     }));
-
-    input.value = '';
   }
 
   removePhoto(phase: PhotoPhase, index: number) {
+    if (this.photoLimitPhase() === phase) this.photoLimitPhase.set(null);
     const key = phase === 'ANTES' ? 'photos_antes' : phase === 'DURANTE' ? 'photos_durante' : 'photos_despues';
     this.draft.update((d) => ({
       ...d,
@@ -251,11 +276,7 @@ export class OrderWizard {
       },
       error: (err) => {
         this.submitting.set(false);
-        const detail =
-          err?.error?.detail ||
-          err?.error?.client_accepted_terms?.[0] ||
-          'No se pudo enviar la orden. Verifica los datos e intenta de nuevo.';
-        this.submitError.set(detail);
+        this.submitError.set(submitErrorMessage(err));
       },
     });
   }

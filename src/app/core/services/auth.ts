@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { AppUser } from '../models/user.model';
@@ -67,10 +67,21 @@ export class Auth {
       .pipe(tap((user) => this.currentUserSignal.set(user)));
   }
 
+  /** Cierra sesión. Aunque el backend falle (sin red, sesión ya vencida),
+   * el estado local se limpia igual para no dejar al usuario "a medias". */
   logout(): Observable<void> {
     return this.http
       .post<void>(`${this.baseUrl}/auth/logout/`, {}, { withCredentials: true })
-      .pipe(tap(() => this.currentUserSignal.set(null)));
+      .pipe(finalize(() => this.currentUserSignal.set(null)));
+  }
+
+  /** Lo llama el interceptor cuando ni el refresh token sirve: la sesión
+   * terminó de verdad y hay que volver a iniciar sesión. */
+  sessionExpired() {
+    const user = this.currentUserSignal();
+    if (!user) return;
+    this.currentUserSignal.set(null);
+    this.router.navigateByUrl(user.role === 'ADMIN' ? '/admin/login' : '/ingeniero/login');
   }
 
   redirectAfterLogin(user: AppUser) {

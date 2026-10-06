@@ -145,6 +145,9 @@ export class Dashboard implements OnInit {
   }
 
   logout() {
-    this.auth.logout().subscribe(() => this.router.navigateByUrl('/admin/login'));
+    this.auth.logout().subscribe({
+      complete: () => this.router.navigateByUrl('/admin/login'),
+      error: () => this.router.navigateByUrl('/admin/login'),
+    });
   }
 }

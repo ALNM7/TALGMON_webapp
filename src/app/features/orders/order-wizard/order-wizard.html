@@ -215,7 +215,7 @@
               <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-ink-700">{{ phaseInfo.label }}</h3>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full" [ngClass]="phaseInfo.color">
-                  {{ photoCount($any(phaseInfo.key)) }} foto(s)
+                  {{ photoCount($any(phaseInfo.key)) }} / {{ maxPhotos }}
                 </span>
               </div>
 
@@ -233,11 +233,21 @@
                 </div>
               }
 
-              <label class="w-full h-12 rounded-xl border-2 border-dashed border-ink-200 text-sm font-semibold text-ink-400 flex items-center justify-center gap-2 hover:border-brand hover:text-brand transition-colors cursor-pointer">
-                Agregar foto
-                <input type="file" accept="image/*" multiple capture="environment" class="sr-only"
-                  (change)="onPhotoSelected($any(phaseInfo.key), $event)" />
-              </label>
+              @if (photoLimitPhase() === phaseInfo.key) {
+                <p class="text-xs text-warn bg-warn-50 rounded-lg px-3 py-2 mb-3">
+                  Máximo {{ maxPhotos }} fotos por etapa. Las fotos de más no se agregaron.
+                </p>
+              }
+
+              @if (photoCount($any(phaseInfo.key)) < maxPhotos) {
+                <label class="w-full h-12 rounded-xl border-2 border-dashed border-ink-200 text-sm font-semibold text-ink-400 flex items-center justify-center gap-2 hover:border-brand hover:text-brand transition-colors cursor-pointer">
+                  Agregar foto
+                  <input type="file" accept="image/*" multiple capture="environment" class="sr-only"
+                    (change)="onPhotoSelected($any(phaseInfo.key), $event)" />
+                </label>
+              } @else {
+                <p class="text-xs text-ink-300 text-center py-3">Llegaste al máximo de fotos para esta etapa</p>
+              }
             </div>
           }
         </div>

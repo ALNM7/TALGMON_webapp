@@ -65,6 +65,9 @@ export class EngineerHome implements OnInit {
   }
 
   logout() {
-    this.auth.logout().subscribe(() => this.router.navigateByUrl('/ingeniero/login'));
+    this.auth.logout().subscribe({
+      complete: () => this.router.navigateByUrl('/ingeniero/login'),
+      error: () => this.router.navigateByUrl('/ingeniero/login'),
+    });
   }
 }
